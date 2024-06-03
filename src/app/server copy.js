@@ -8,19 +8,12 @@ const setCorsHeaders = (res) => {
 	res.setHeader("Access-Control-Allow-Origin", "*");
 	res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
 	res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-	res.setHeader("Content-Type", "image");
 };
 
 const server = http.createServer((req, res) => {
 	setCorsHeaders(res);
 
-	if (req.method === "OPTIONS") {
-		res.writeHead(200);
-		res.end();
-		return;
-	}
-
-	if (req.method === "POST" && req.url === "/upload") {
+	if (req.method === "POST" && req.url === "/uploads") {
 		const chunks = [];
 
 		req.on("data", (chunk) => {
@@ -40,10 +33,7 @@ const server = http.createServer((req, res) => {
 
 					if (filenameMatch && filenameMatch[1]) {
 						filename = filenameMatch[1].trim().split(";")[0];
-						if (filename.startsWith("UTF-8''")) {
-							filename = filename.replace("UTF-8''", "");
-							filename = decodeURIComponent(filename);
-						}
+						filename = Buffer.from(filename, "latin1").toString("utf8").slice(0, -1);
 					}
 
 					if (filename) {
@@ -54,7 +44,6 @@ const server = http.createServer((req, res) => {
 						if (!fs.existsSync(uploadDirectory)) {
 							fs.mkdirSync(uploadDirectory, { recursive: true });
 						}
-
 						const filePath = path.join(uploadDirectory, filename);
 						fs.writeFileSync(filePath, Buffer.from(fileData, "binary"));
 					}
@@ -72,5 +61,5 @@ const server = http.createServer((req, res) => {
 
 const PORT = 8888;
 server.listen(PORT, () => {
-	console.log(`Server is running on http://localhost:${PORT}`);
+	console.log(`Server is running on http://localhost:${PORT}/uploads`);
 });

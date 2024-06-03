@@ -3,8 +3,8 @@ import FileUploader from "./FileUploader";
 
 export default function Home() {
 	return (
-		<main className="flex min-h-screen flex-col items-center justify-between p-24">
-			<div className="">UploadImages</div>
+		<main className=" m-10 flex min-h-screen flex-col items-center  gap-4 p-30">
+			<div className=" text-2xl">Many File Uploading [image/csv]</div>
 			<FileUploader />
 		</main>
 	);
